@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Score Dashboard</title>
+  <style>
+    @font-face {
+        font-family: 'Rajdhani';
+        src: url('Rajdhani-Regular.ttf') format('truetype');
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Rajdhani", sans-serif;
+      background-image: url(BGDashboard.jpg);
+      color: #55ead4;
+      min-height: 100vh;
+    }
+    
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+            to bottom,
+            #c5003b11 0px,
+            #c5003b47 1px,
+            transparent 1px,
+            transparent 3px
+        );
+        z-index: 999;
+    }
+
+
+    body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        background: #c5003b15;
+        animation: flicker 0.15s infinite;
+        z-index: 998;
+    }
+
+
+    @keyframes flicker {
+        0% { opacity: 0.95; }
+        50% { opacity: 1; }
+        100% { opacity: 0.92; }
+    }
+
+    .viewport {
+      transform-origin: center center;
+      width: 100%;
+    }
+
+    .glitch-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1001;
+      overflow: hidden;
+      opacity: 0;
+    }
+
+    .glitch-overlay.is-active {
+      opacity: 1;
+    }
+
+    body.distort-shake .viewport {
+      animation: screen-shake 0.14s steps(4) forwards;
+    }
+
+    body.distort-rgb .viewport {
+      animation: screen-rgb 0.16s steps(3) forwards;
+    }
+
+    body.distort-warp .viewport {
+      animation: screen-warp 0.18s steps(3) forwards;
+    }
+
+    @keyframes screen-shake {
+      0%   { transform: translate(0); filter: none; }
+      25%  { transform: translate(-8px, 4px) skewX(-0.8deg); }
+      50%  { transform: translate(10px, -3px) skewX(0.6deg); filter: contrast(1.35) saturate(1.4); }
+      75%  { transform: translate(-5px, -5px); }
+      100% { transform: translate(0); filter: none; }
+    }
+
+    @keyframes screen-warp {
+      0%   { transform: perspective(900px) rotateX(0) scale(1); }
+      40%  { transform: perspective(900px) rotateX(1.2deg) skewX(-2deg) scale(1.02); filter: contrast(1.5); }
+      70%  { transform: perspective(900px) rotateX(-0.8deg) skewX(1.5deg) scale(0.99); }
+      100% { transform: none; filter: none; }
+    }
+ 
+    .navbar {
+        background-color: #000000;
+        padding: 15px 0;
+        text-align: center;
+        width: 100%;
+        position: sticky;
+        top: 0;
+        border-bottom: 2px solid #880425;
+        z-index: 1000;
+    }
+
+    .navbar a {
+        color: #880425;
+        text-decoration: none;
+        font-weight: bold;
+        margin: 0 20px;
+    }
+
+    .navbar a:hover {
+        color: #55ead4;
+    }
+
+    .navbar a.is-current {
+      color: #f3e600;
+    }
+
+    .main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .board {
+      position: relative;
+      width: 100%;
+      max-width: 1440px;
+      aspect-ratio: 1440 / 1024;
+    }
+
+    .board img,
+    .board svg,
+    .board .hex {
+      position: absolute;
+    }
+
+    .connections {
+      width: 100%;
+      height: 100%;
+      left: 0;
+      top: 0;
+      pointer-events: none;
+    }
+
+    .hex {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #3b000f;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      text-align: center;
+      pointer-events: none;
+    }
+
+    a.hex {
+      pointer-events: auto;
+      cursor: pointer;
+      text-decoration: none;
+      color: #55ead4;
+
+    }
+
+    a.hex:hover {
+      filter: brightness(1.25);
+    }
+
+    .hex.center {
+      background: #0c002c;
+      border: 1px solid #690020;
+    }
+
+    .hex-value {
+      font-size: clamp(28px, 3.5vw, 56px);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .hex.center .hex-value {
+      font-size: clamp(36px, 4.5vw, 64px);
+    }
+
+    .hex-label {
+      font-size: clamp(14px, 1.8vw, 28px);
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    .hex-value.glitch,
+    .hex-label.glitch,
+    .navbar a.glitch {
+      animation: text-glitch 0.3s steps(3);
+    }
+
+    @keyframes text-glitch {
+      0% {
+        transform: translate(0);
+        text-shadow: none;
+      }
+      33% {
+        transform: translate(-3px, 1px) skewX(-4deg);
+        color: #c5003c;
+        text-shadow: 3px 0 #880425;
+      }
+      66% {
+        transform: translate(3px, -1px) skewX(4deg);
+        color: #55ead4;
+        text-shadow: -3px 0 #c5003c;
+      }
+      100% {
+        transform: translate(0);
+        text-shadow: none;
+      }
+    }
+
+    .hex-quizzes-top    { left: 41.7%; top: 10.8%; width: 16.5%; height: 17.3%; }
+    .hex-lab-top        { left: 25.2%; top: 21.5%; width: 16.5%; height: 17.2%; }
+    .hex-exams-top      { left: 58.2%; top: 21.5%; width: 16.5%; height: 17.2%; }
+    .hex-total          { left: 38.9%; top: 37.1%; width: 22.1%; height: 25.8%; }
+    .hex-lab-bottom     { left: 25.2%; top: 61%;   width: 16.5%; height: 17.3%; }
+    .hex-exams-bottom   { left: 58.2%; top: 61%;   width: 16.5%; height: 17.3%; }
+    .hex-quizzes-bottom { left: 41.7%; top: 71.4%; width: 16.5%; height: 17.3%; }
+
+    .art-1 { left: 34.1%; top: 32.9%; width: 14.4%; }
+    .art-2 { left: 50.3%; top: 31.4%; width: 14.4%; }
+    .art-3 { left: 47.7%; top: 25.5%; width: 4.5%; }
+    .art-4 { left: 34.4%; top: 49.7%; width: 14.4%; }
+    .art-5 { left: 51.7%; top: 47.6%; width: 14.4%; }
+    .art-6 { left: 48.2%; top: 52.9%; width: 4.5%; }
+  </style>
+</head>
+<body>
+
+  <div class="glitch-noise" id="glitchNoise" aria-hidden="true"></div>
+  <div class="glitch-overlay" id="glitchOverlay" aria-hidden="true"></div>
+
+  <div class="viewport" id="viewport">
+  <div class="navbar">
+    <a href="index.html">Home</a>
+    <a href="dashboard.html" class="is-current">Dashboard</a>
+    <a href="quizzes.html">Quizzes</a>
+    <a href="lab.html">Laboratory</a>
+    <a href="exams.html">Exams</a>
+  </div>
+
+  <div class="main">
+  <div class="board" id="board">
+
+    <svg class="connections" viewBox="0 0 1440 1024">
+      <line x1="653" y1="436" x2="711" y2="494" stroke="#C5003C"/>
+      <line x1="727" y1="530" x2="786" y2="589" stroke="#C5003C"/>
+      <line x1="726" y1="435" x2="785" y2="494" stroke="#C5003C"/>
+      <line x1="654" y1="531" x2="712" y2="589" stroke="#C5003C"/>
+      <line x1="711" y1="493" x2="711" y2="531" stroke="#C5003C"/>
+      <line x1="726" y1="493" x2="726" y2="531" stroke="#C5003C"/>
+    </svg>
+
+    <img src="Pictures\group-4.svg" alt="" class="art-1">
+    <img src="Pictures\group-5.svg" alt="" class="art-2">
+    <img src="Pictures\group-3.svg" alt="" class="art-3">
+    <img src="Pictures\group-1.svg" alt="" class="art-4">
+    <img src="Pictures\group-2.svg" alt="" class="art-5">
+    <img src="Pictures\group-6.svg" alt="" class="art-6">
+
+    <div class="hex hex-quizzes-top">
+      <div class="hex-value">0</div>
+      <div class="hex-label">Quizzes</div>
+    </div>
+
+    <div class="hex hex-lab-top">
+      <div class="hex-value">3</div>
+      <div class="hex-label">Lab</div>
+    </div>
+
+    <div class="hex hex-exams-top">
+      <div class="hex-value">0</div>
+      <div class="hex-label">Exams</div>
+    </div>
+
+    <div class="hex center hex-total">
+      <div class="hex-value">3</div>
+      <div class="hex-label">Total</div>
+    </div>
+
+    <a href="lab.html" class="hex hex-lab-bottom">
+      <div class="hex-label">Lab</div>
+    </a>
+
+    <a href="exams.html" class="hex hex-exams-bottom">
+      <div class="hex-label">Exams</div>
+    </a>
+
+    <a href="quizzes.html" class="hex hex-quizzes-bottom">
+      <div class="hex-label">Quizzes</div>
+    </a>
+
+  </div>
+  </div>
+  </div>
+
+  <script>
+    var texts = document.querySelectorAll(".hex-value, .hex-label, .navbar a");
+    var glitchOverlay = document.getElementById("glitchOverlay");
+    var glitchNoise = document.getElementById("glitchNoise");
+    var distortTypes = ["shake", "rgb", "warp", "flash", "slices", "noise"];
+
+    function buildSliceTear() {
+      glitchOverlay.innerHTML = "";
+      var count = 4 + Math.floor(Math.random() * 6);
+      var y = 0;
+      for (var i = 0; i < count; i++) {
+        var h = 4 + Math.random() * 14;
+        var slice = document.createElement("div");
+        slice.className = "slice";
+        slice.style.top = y + "%";
+        slice.style.height = h + "%";
+        slice.style.transform = "translateX(" + ((Math.random() - 0.5) * 24).toFixed(1) + "%)";
+        glitchOverlay.appendChild(slice);
+        y += h + Math.random() * 8;
+        if (y > 100) break;
+      }
+    }
+
+    function clearScreenDistort(type) {
+      document.body.classList.remove("distort-" + type);
+      glitchOverlay.classList.remove("is-active");
+      glitchOverlay.innerHTML = "";
+      glitchNoise.classList.remove("is-active");
+    }
+
+    function triggerScreenDistort() {
+      var type = distortTypes[Math.floor(Math.random() * distortTypes.length)];
+      var duration = 90 + Math.random() * 400;
+
+      if (type === "slices") {
+        buildSliceTear();
+        glitchOverlay.classList.add("is-active");
+      } else if (type === "noise") {
+        glitchNoise.classList.add("is-active");
+      } else {
+        document.body.classList.add("distort-" + type);
+      }
+
+      setTimeout(function () {
+        clearScreenDistort(type);
+      }, duration);
+
+      var wait = 2500 + Math.random() * 4500;
+      setTimeout(triggerScreenDistort, wait);
+    }
+
+    function glitchRandomText() {
+      var el = texts[Math.floor(Math.random() * texts.length)];
+      el.classList.add("glitch");
+
+      setTimeout(function () {
+        el.classList.remove("glitch");
+      }, 300);
+
+      var wait = 1000 + Math.random() * 4000;
+      setTimeout(glitchRandomText, wait);
+    }
+
+    setTimeout(glitchRandomText, 750);
+    setTimeout(triggerScreenDistort, 2400);
+  </script>
+
+</body>
+</html>

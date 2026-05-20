@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratory</title>
+  <style>
+    @font-face {
+      font-family: 'Rajdhani';
+      src: url('Rajdhani-Regular.ttf') format('truetype');
+      font-weight: 400;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Rajdhani", sans-serif;
+      background-image: url(quizzesBG.jpg);
+      background-size: contain;
+      min-height: 100vh;
+    }
+    
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+            to bottom,
+            #c5003b11 0px,
+            #c5003b47 1px,
+            transparent 1px,
+            transparent 3px
+        );
+        z-index: 999;
+    }
+
+
+    body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        background: #c5003b15;
+        animation: flicker 0.15s infinite;
+        z-index: 998;
+    }
+
+
+    @keyframes flicker {
+        0% { opacity: 0.95; }
+        50% { opacity: 1; }
+        100% { opacity: 0.92; }
+    }
+
+    .viewport {
+      transform-origin: center center;
+      width: 100%;
+    }
+
+    .glitch-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1001;
+      overflow: hidden;
+      opacity: 0;
+    }
+
+    .glitch-overlay.is-active {
+      opacity: 1;
+    }
+    
+    body.distort-shake .viewport {
+      animation: screen-shake 0.14s steps(4) forwards;
+    }
+
+    body.distort-rgb .viewport {
+      animation: screen-rgb 0.16s steps(3) forwards;
+    }
+
+    body.distort-warp .viewport {
+      animation: screen-warp 0.18s steps(3) forwards;
+    }
+
+    @keyframes screen-shake {
+      0%   { transform: translate(0); filter: none; }
+      25%  { transform: translate(-8px, 4px) skewX(-0.8deg); }
+      50%  { transform: translate(10px, -3px) skewX(0.6deg); filter: contrast(1.35) saturate(1.4); }
+      75%  { transform: translate(-5px, -5px); }
+      100% { transform: translate(0); filter: none; }
+    }
+
+    @keyframes screen-warp {
+      0%   { transform: perspective(900px) rotateX(0) scale(1); }
+      40%  { transform: perspective(900px) rotateX(1.2deg) skewX(-2deg) scale(1.02); filter: contrast(1.5); }
+      70%  { transform: perspective(900px) rotateX(-0.8deg) skewX(1.5deg) scale(0.99); }
+      100% { transform: none; filter: none; }
+    }
+
+    .navbar {
+      background-color: #000000;
+      padding: 15px 0;
+      text-align: center;
+      width: 100%;
+      position: sticky;
+      top: 0;
+      border-bottom: 2px solid #880425;
+      z-index: 1000;
+    }
+
+    .navbar a {
+      color: #880425;
+      text-decoration: none;
+      font-weight: bold;
+      margin: 0 20px;
+      display: inline-block;
+      position: relative;
+    }
+
+    .navbar a:hover {
+      color: #55ead4;
+    }
+
+    .navbar a.is-current {
+      color: #f3e600;
+    }
+
+    .glitch-target {
+      position: relative;
+    }
+
+    .glitch-target.glitching {
+      animation: glitch-jolt 0.28s steps(4) both;
+    }
+
+    .glitch-target.glitching::before,
+    .glitch-target.glitching::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .quiz-btn.glitch-target.glitching::before,
+    .quiz-btn.glitch-target.glitching::after {
+      content: none;
+    }
+
+    .glitch-target.glitching::before {
+      color: #55ead4;
+      clip-path: inset(0 0 55% 0);
+      transform: translate(-3px, -1px);
+      opacity: 0.85;
+    }
+
+    .glitch-target.glitching::after {
+      color: #c5003c;
+      clip-path: inset(45% 0 0 0);
+      transform: translate(3px, 1px);
+      opacity: 0.85;
+    }
+
+    .quiz-title.glitch-target.glitching::before,
+    .quiz-title.glitch-target.glitching::after,
+    .quiz-path.glitch-target.glitching::before,
+    .quiz-path.glitch-target.glitching::after {
+      font-size: inherit;
+      font-weight: inherit;
+      line-height: inherit;
+    }
+
+    @keyframes glitch-jolt {
+      0% { transform: translate(0); filter: none; }
+      15% { transform: translate(-4px, 2px) skew(-3deg); filter: hue-rotate(90deg); }
+      30% { transform: translate(3px, -2px) skew(2deg); }
+      45% { transform: translate(-2px, 0); opacity: 0.7; }
+      60% { transform: translate(2px, 1px) skew(-1deg); }
+      75% { transform: translate(-1px, -1px); filter: brightness(1.4); }
+      100% { transform: translate(0); filter: none; opacity: 1; }
+    }
+
+    .image-frame.is-empty.glitch-label::before {
+      animation: glitch-jolt 0.3s steps(3) both;
+    }
+
+    .page-wrap {
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+      padding: 24px 0;
+    }
+
+    .page {
+      position: relative;
+      width: 1440px;
+      height: 1024px;
+      flex-shrink: 0;
+    }
+
+    .nav-art {
+      position: absolute;
+      left: 80px;
+      top: 75px;
+      width: 454.69px;
+      height: 618px;
+      pointer-events: none;
+    }
+
+    .quiz-btn {
+      position: absolute;
+      left: 82px;
+      width: 389px;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
+      overflow: visible;
+      transition: filter 0.2s ease;
+    }
+
+    .quiz-btn-1 { top: 126px; height: 96px; }
+    .quiz-btn-2 { top: 282px; height: 95px; }
+    .quiz-btn-3 { top: 437px; height: 95px; }
+    .quiz-btn-4 { top: 592px; height: 96px; }
+
+    .quiz-copy {
+      position: absolute;
+      top: 8px;
+      width: 336px;
+      height: 80px;
+      transition: transform 0.22s ease;
+      font-family: 'Rajdhani', serif;
+    }
+
+    .quiz-btn-1 .quiz-copy,
+    .quiz-btn-3 .quiz-copy { left: 32px; }
+
+    .quiz-btn-2 .quiz-copy,
+    .quiz-btn-4 .quiz-copy { left: 27px; }
+
+    .quiz-btn:hover .quiz-copy {
+      transform: translate(5px, -3px);
+    }
+
+    .quiz-btn:hover {
+      filter: brightness(1.15);
+    }
+
+    .quiz-btn.is-active .quiz-title {
+      text-shadow: 0 0 12px rgba(243, 230, 0, 0.45);
+    }
+
+    .quiz-title {
+        display: block;
+        font-size: 32px;
+        font-weight: 1000;
+        line-height: 41px;
+        height: 41px;
+        color: #f3e600;
+    }
+
+    .quiz-path {
+      display: block;
+      font-size: 32px;
+      font-weight: 400;
+      line-height: 41px;
+      height: 41px;
+      margin-top: -2px;
+      color: #55ead4;
+      white-space: nowrap;
+    }
+
+    .image-frame {
+      position: absolute;
+      left: 599px;
+      top: 126px;
+      width: 803px;
+      height: 826px;
+      border: 6px solid #880425;
+      overflow: hidden;
+    }
+
+    .image-frame.is-empty::before {
+      content: "This page is monitored by the NCPD";
+      position: absolute;
+      left: 334px;
+      top: 383px;
+      width: 136px;
+      height: 41px;
+      font-size: 32px;
+      font-weight: 400;
+      line-height: 41px;
+      color: #55ead4;
+      text-align: center;
+    }
+
+    .quiz-image-wrap {
+      position: absolute;
+      inset: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(28px);
+      pointer-events: none;
+    }
+
+    .quiz-image-wrap.is-visible {
+      animation: fadeSlideUp 0.45s ease forwards;
+      pointer-events: auto;
+    }
+
+    .quiz-image-wrap img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      display: block;
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(28px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="glitch-noise" id="glitchNoise" aria-hidden="true"></div>
+  <div class="glitch-overlay" id="glitchOverlay" aria-hidden="true"></div>
+
+  <div class="viewport" id="viewport">
+  <nav class="navbar">
+    <a href="index.html" class="glitch-target">Home</a>
+    <a href="dashboard.html" class="glitch-target">Dashboard</a>
+    <a href="quizzes.html" class="glitch-target">Quizzes</a>
+    <a href="lab.html" class="glitch-target is-current">Laboratory</a>
+    <a href="exams.html" class="glitch-target">Exams</a>
+  </nav>
+
+  <div class="page-wrap">
+    <div class="page">
+      <svg class="nav-art" width="455" height="618" viewBox="0 0 455 618" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="3" y="52" width="387" height="94" stroke="#C5003C" stroke-width="2"/>
+        <rect x="3" y="208" width="387" height="93" stroke="#C5003C" stroke-width="2"/>
+        <rect x="3" y="363" width="387" height="93" stroke="#C5003C" stroke-width="2"/>
+        <rect x="370.424" width="110" height="66" transform="rotate(40 370.424 0)" fill="black"/>
+        <rect x="370.424" y="311" width="110" height="66" transform="rotate(40 370.424 311)" fill="black"/>
+        <rect x="370.424" y="156" width="110" height="66" transform="rotate(40 370.424 156)" fill="black"/>
+        <line x1="2.999" y1="206.646" x2="23" y2="227.646" stroke="#C5003C"/>
+        <line x1="22.5" y1="227" x2="23" y2="300" stroke="#C5003C"/>
+        <line x1="2.999" y1="363" x2="23" y2="382" stroke="#C5003C"/>
+        <line x1="23" y1="381" x2="23" y2="457" stroke="#C5003C"/>
+        <line x1="2" y1="51" x2="21.3536" y2="70.6464" stroke="#C5003C"/>
+        <line x1="20.5" y1="70" x2="20.5" y2="146" stroke="#C5003C"/>
+        <line x1="390.834" y1="408.664" x2="335.679" y2="362.383" stroke="#55EAD4"/>
+        <line x1="390.834" y1="253.664" x2="335.679" y2="207.383" stroke="#55EAD4"/>
+        <line x1="390.834" y1="98.6637" x2="335.679" y2="52.383" stroke="#55EAD4"/>
+      </svg>
+
+      <button type="button" class="quiz-btn quiz-btn-1 glitch-target" data-quiz="1">
+        <span class="quiz-copy">
+          <span class="quiz-title glitch-target" data-text="C@r0us3L">Carousel</span>
+          <span class="quiz-path glitch-target" data-text="../..__1.1_!1../..__1.1_!1">Lab 1</span>
+        </span>
+      </button>
+
+      <button type="button" class="quiz-btn quiz-btn-2 glitch-target" data-quiz="2">
+        <span class="quiz-copy">
+          <span class="quiz-title glitch-target" data-text="J4vA5cr1p7">JavaScript</span>
+          <span class="quiz-path glitch-target" data-text="../~~/~22../..__|2">Lab 2</span>
+        </span>
+      </button>
+
+      <button type="button" class="quiz-btn quiz-btn-3 glitch-target" data-quiz="3">
+        <span class="quiz-copy">
+          <span class="quiz-title glitch-target" data-text="R3g1s7r@ti0N">Registration</span>
+          <span class="quiz-path glitch-target" data-text="3./../3/..3...//__3">Lab 3</span>
+        </span>
+      </button>
+
+      <div class="image-frame is-empty" id="image-frame">
+        <div class="quiz-image-wrap" id="quiz-image-wrap">
+          <img id="quiz-image" src="" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script>
+    var quizImages = {
+      1: "Pictures\\Screenshot 2026-05-21 015258.png",
+      2: "Pictures\\Screenshot 2026-05-21 021406.png",
+      3: "Pictures\\Screenshot 2026-05-21 021415.png",
+    };
+
+    var buttons = document.querySelectorAll(".quiz-btn");
+    var frame = document.getElementById("image-frame");
+    var wrap = document.getElementById("quiz-image-wrap");
+    var img = document.getElementById("quiz-image");
+
+    function showQuiz(id) {
+      var src = quizImages[id];
+
+      buttons.forEach(function (btn) {
+        btn.classList.toggle("is-active", btn.getAttribute("data-quiz") === String(id));
+      });
+
+      wrap.classList.remove("is-visible");
+      void wrap.offsetWidth;
+
+      if (!src) {
+        frame.classList.add("is-empty");
+        img.removeAttribute("src");
+        img.alt = "";
+        return;
+      }
+
+      frame.classList.remove("is-empty");
+      img.src = src;
+      img.alt = "Lab " + id;
+      wrap.classList.add("is-visible");
+    }
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        showQuiz(btn.getAttribute("data-quiz"));
+      });
+    });
+
+    var glitchPool = document.querySelectorAll(".glitch-target");
+    var scrambleChars = "!<>_-/?|~@#%&*[]{}=+";
+
+    function scrambleEl(el) {
+      var original = el.getAttribute("data-text") || el.textContent;
+      if (!original || original.length < 2) return;
+
+      el.setAttribute("data-text", original);
+      var ticks = 0;
+      var maxTicks = 4 + Math.floor(Math.random() * 5);
+
+      var timer = setInterval(function () {
+        ticks++;
+        if (ticks >= maxTicks) {
+          el.textContent = original;
+          clearInterval(timer);
+          return;
+        }
+        el.textContent = original.split("").map(function (ch) {
+          if (ch === " " || ch === "." || ch === "/") return ch;
+          return scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+        }).join("");
+      }, 45);
+    }
+
+    function runGlitch() {
+      if (!glitchPool.length) return;
+
+      var el = glitchPool[Math.floor(Math.random() * glitchPool.length)];
+      el.classList.add("glitching");
+
+      if (el.classList.contains("quiz-title") || el.classList.contains("quiz-path") || el.tagName === "A") {
+        if (Math.random() > 0.35) scrambleEl(el);
+      }
+
+      if (el.classList.contains("quiz-btn")) {
+        var kids = el.querySelectorAll(".quiz-title, .quiz-path");
+        if (kids.length && Math.random() > 0.4) {
+          scrambleEl(kids[Math.floor(Math.random() * kids.length)]);
+        }
+      }
+
+      if (frame.classList.contains("is-empty") && Math.random() > 0.7) {
+        frame.classList.add("glitch-label");
+        setTimeout(function () { frame.classList.remove("glitch-label"); }, 320);
+      }
+
+      setTimeout(function () {
+        el.classList.remove("glitching");
+      }, 280);
+    }
+
+    document.querySelectorAll(".navbar a").forEach(function (link) {
+      link.setAttribute("data-text", link.textContent);
+    });
+
+    function scheduleGlitch() {
+      runGlitch();
+      setTimeout(scheduleGlitch, 600 + Math.random() * 2200);
+    }
+
+    var glitchOverlay = document.getElementById("glitchOverlay");
+    var glitchNoise = document.getElementById("glitchNoise");
+    var distortTypes = ["shake", "rgb", "warp", "flash", "slices", "noise"];
+
+    function buildSliceTear() {
+      glitchOverlay.innerHTML = "";
+      var count = 4 + Math.floor(Math.random() * 6);
+      var y = 0;
+      for (var i = 0; i < count; i++) {
+        var h = 4 + Math.random() * 14;
+        var slice = document.createElement("div");
+        slice.className = "slice";
+        slice.style.top = y + "%";
+        slice.style.height = h + "%";
+        slice.style.transform = "translateX(" + ((Math.random() - 0.5) * 24).toFixed(1) + "%)";
+        glitchOverlay.appendChild(slice);
+        y += h + Math.random() * 8;
+        if (y > 100) break;
+      }
+    }
+
+    function clearScreenDistort(type) {
+      document.body.classList.remove("distort-" + type);
+      glitchOverlay.classList.remove("is-active");
+      glitchOverlay.innerHTML = "";
+      glitchNoise.classList.remove("is-active");
+    }
+
+    function triggerScreenDistort() {
+      var type = distortTypes[Math.floor(Math.random() * distortTypes.length)];
+      var duration = 90 + Math.random() * 200;
+
+      if (type === "slices") {
+        buildSliceTear();
+        glitchOverlay.classList.add("is-active");
+      } else if (type === "noise") {
+        glitchNoise.classList.add("is-active");
+      } else {
+        document.body.classList.add("distort-" + type);
+      }
+
+      setTimeout(function () {
+        clearScreenDistort(type);
+      }, duration);
+
+      var wait = 2500 + Math.random() * 4500;
+      setTimeout(triggerScreenDistort, wait);
+    }
+
+    scheduleGlitch();
+    setTimeout(triggerScreenDistort, 1200);
+  </script>
+</body>
+</html>

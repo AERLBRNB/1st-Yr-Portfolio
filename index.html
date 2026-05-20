@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=0.5">
+<title>Portfolio - Home</title>
+
+<style>
+@font-face {
+    font-family: 'Rajdhani';
+    src: url('Rajdhani-Regular.ttf') format('truetype');
+}
+
+body {
+    margin: 0;
+    background-image: url(indexBG.jpg);
+    background-size: cover;
+    color: #c5003c;
+    font-family: 'Rajdhani', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+body h2 {
+    color: #55ead4;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+        to bottom,
+        #c5003b11 0px,
+        #c5003b47 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    z-index: 999;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: #c5003b15;
+    animation: flicker 0.15s infinite;
+    z-index: 998;
+}
+
+@keyframes flicker {
+    0% { opacity: 0.95; }
+    50% { opacity: 1; }
+    100% { opacity: 0.92; }
+}
+
+    .viewport {
+      transform-origin: center center;
+      width: 100%;
+    }
+
+    .glitch-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1001;
+      overflow: hidden;
+      opacity: 0;
+    }
+
+    .glitch-overlay.is-active {
+      opacity: 1;
+    }
+
+    body.distort-shake .viewport {
+      animation: screen-shake 0.14s steps(4) forwards;
+    }
+
+    body.distort-rgb .viewport {
+      animation: screen-rgb 0.16s steps(3) forwards;
+    }
+
+    body.distort-warp .viewport {
+      animation: screen-warp 0.18s steps(3) forwards;
+    }
+
+    @keyframes screen-shake {
+      0%   { transform: translate(0); filter: none; }
+      25%  { transform: translate(-8px, 4px) skewX(-0.8deg); }
+      50%  { transform: translate(10px, -3px) skewX(0.6deg); filter: contrast(1.35) saturate(1.4); }
+      75%  { transform: translate(-5px, -5px); }
+      100% { transform: translate(0); filter: none; }
+    }
+
+    @keyframes screen-warp {
+      0%   { transform: perspective(900px) rotateX(0) scale(1); }
+      40%  { transform: perspective(900px) rotateX(1.2deg) skewX(-2deg) scale(1.02); filter: contrast(1.5); }
+      70%  { transform: perspective(900px) rotateX(-0.8deg) skewX(1.5deg) scale(0.99); }
+      100% { transform: none; filter: none; }
+    }
+ 
+.navbar {
+    background-color: #000000;
+    padding: 15px 0;
+    text-align: center;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    border-bottom: 2px solid #880425;
+    z-index: 1000;
+}
+
+.navbar a {
+    color: #880425;
+    text-decoration: none;
+    font-weight: bold;
+    margin: 0 20px;
+}
+
+.navbar a:hover {
+    color: #55ead4;
+}
+
+.navbar a.is-current {
+      color: #f3e600;
+    }
+
+.container {
+    position: relative;
+    max-width: 1000px;
+    width: 90%;
+    margin: 40px auto;
+    background-color: #0b0502;
+    border: 3px solid #880425;
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.main-content {
+    flex: 1;
+}
+
+.right-side {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.top-image {
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+}
+
+.glitch {
+    position: relative;
+    width: 100%;
+    height: 150px;
+}
+
+.glitch img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+.glitch::before,
+.glitch::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('Untitled1_20260501145527.png') center / cover no-repeat;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0;
+}
+
+.glitch::before {
+    left: -4px;
+    filter: drop-shadow(4px 0 #ff0040);
+    mix-blend-mode: screen;
+    animation: image-glitch-red 2.5s infinite steps(1);
+}
+
+.glitch::after {
+    left: 4px;
+    filter: drop-shadow(-4px 0 #00fff2);
+    mix-blend-mode: screen;
+    animation: image-glitch-cyan 2s infinite steps(1);
+}
+
+.glitch img {
+    animation: image-glitch-main 2s infinite steps(1);
+}
+
+@keyframes image-glitch-main {
+    0%, 88%, 100% {
+        transform: translate(0);
+        filter: none;
+    }
+    90% {
+        transform: translate(-3px, 0) skewX(1deg);
+        filter: brightness(1.3) contrast(1.2);
+    }
+    92% {
+        transform: translate(4px, 1px) skewX(-2deg);
+    }
+    94% {
+        transform: translate(-2px, -1px);
+    }
+    96% {
+        transform: translate(2px, 0);
+    }
+}
+
+@keyframes image-glitch-red {
+    0%, 88%, 100% {
+        opacity: 0;
+        clip-path: inset(0 0 0 0);
+    }
+    90% {
+        opacity: 0.85;
+        clip-path: inset(5% 0 55% 0);
+    }
+    92% {
+        opacity: 0.7;
+        clip-path: inset(45% 0 20% 0);
+        transform: translate(-6px, 0);
+    }
+    94% {
+        opacity: 0.9;
+        clip-path: inset(70% 0 5% 0);
+    }
+    96% {
+        opacity: 0.6;
+        clip-path: inset(15% 0 65% 0);
+        transform: translate(-4px, 2px);
+    }
+}
+
+@keyframes image-glitch-cyan {
+    0%, 88%, 100% {
+        opacity: 0;
+        clip-path: inset(0 0 0 0);
+    }
+    90% {
+        opacity: 0.85;
+        clip-path: inset(60% 0 10% 0);
+    }
+    91% {
+        opacity: 0.75;
+        clip-path: inset(20% 0 50% 0);
+        transform: translate(6px, 0);
+    }
+    93% {
+        opacity: 0.9;
+        clip-path: inset(35% 0 35% 0);
+    }
+    95% {
+        opacity: 0.65;
+        clip-path: inset(80% 0 0 0);
+        transform: translate(5px, -2px);
+    }
+    97% {
+        opacity: 0.8;
+        clip-path: inset(0 0 75% 0);
+    }
+}
+
+.spotify-box {
+    background-color: #0f0704;
+    border: 2px solid #880425;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.profile-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.profile-card img {
+    width: 150px;
+    height: 150px;
+    border: 3px solid #880425;
+    object-fit: cover;
+}
+
+.profile-card img.identity-glitch {
+    animation: identity-img-glitch .2s steps(2);
+    filter: contrast(1.45) saturate(1.35) hue-rotate(-8deg);
+}
+
+.profiletext h1 {
+    margin: 0;
+    color: #55ead4;
+}
+
+#profile-name.identity-swap {
+    font-family: 'Rajdhani', sans-serif;
+    animation: identity-name-glitch .5s steps(2);
+}
+
+@keyframes identity-img-glitch {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(-4px, 2px) skewX(-3deg); }
+    40% { transform: translate(5px, -2px) skewX(2deg); }
+    60% { transform: translate(-3px, -1px); }
+    80% { transform: translate(3px, 1px) skewX(-1deg); }
+}
+
+@keyframes identity-name-glitch {
+    0%, 100% { transform: translate(0); text-shadow: none; }
+    25% { transform: translate(-4px, 1px) skewX(-5deg); color: #c5003c; text-shadow: 3px 0 #880425; }
+    50% { transform: translate(4px, -1px) skewX(4deg); color: #f3e600; text-shadow: -3px 0 #55ead4; }
+    75% { transform: translate(-2px, 0); color: #ff0040; }
+}
+
+.section {
+    border-left: 5px solid #880425;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.section p {
+    line-height: 1.5;
+}
+
+.text-glitch {
+    animation: text-glitch 0.35s steps(3);
+}
+
+@keyframes text-glitch {
+    0% {
+        transform: translate(0);
+        text-shadow: none;
+    }
+    33% {
+        transform: translate(-3px, 1px) skewX(-4deg);
+        color: #ff0040;
+        text-shadow: 3px 0 #880425;
+    }
+    66% {
+        transform: translate(3px, -1px) skewX(4deg);
+        color: #55ead4;
+        text-shadow: -3px 0 #c5003c;
+    }
+    100% {
+        transform: translate(0);
+        text-shadow: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="glitch-noise" id="glitchNoise" aria-hidden="true"></div>
+<div class="glitch-overlay" id="glitchOverlay" aria-hidden="true"></div>
+
+<div class="viewport" id="viewport">
+<div class="navbar">
+    <a href="index.html" class="is-current">Home</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="quizzes.html">Quizzes</a>
+    <a href="lab.html">Laboratory</a>
+    <a href="exams.html">Exams</a>
+</div>
+
+<div class="container">
+
+    <div class="main-content">
+
+        <div class="profile-card" id="top">
+            <img
+              id="profile-photo"
+              src="Pictures\476830553_1297221214885807_2249127537561049501_n.jpg"
+              alt="Profile"
+              data-alt-src="The_Enhanced_Logo_CPRED.jpg">
+
+            <div class="profiletext">
+                <h1 id="profile-name" data-alt-text="E4rL J4m d. B3rN4d3">Earl Jam B. Bernabe</h1>
+                <p>BS Computer Science - CS-1B</p>
+                <p>Student No: 251101135</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>About Me</h2>
+            <p>I'm Earl, called as Jam by people who has known me for a long time. I spend my time mostly at home playing games, specifically first-person shooters, and at work in Mcdonald's.
+                I'd like to improve some things about myself, especially my lack of responsibilty in things, and some other things. <br><br> I enjoy hanging out with people that gives feedback about myself and try to improve on said things.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Skills</h2>
+            <p>HTML, CSS, Basic JavaScript, Java, C++, Adobe Photoshop, Davinci Resolve, Clip Studio Paint, Blender</p>
+        </div>
+
+        <div class="section">
+            <h2>Hobbies</h2>
+            <p>Playing games, Drawing, Listening to Music, Drinking, Hanging out with friends, Fixing Laptops and Desktops, Tekken, Guitar</p>
+        </div>
+
+        <div class="section">
+            <h2>Contact</h2>
+            <p> E-mail: earljam.bernabe@cvsu.edu.ph
+                SocMed: <a style="color:#f3e600;" href="https://www.facebook.com/earljam.bernabe.946">www.facebook.com/earljam.bernabe.946</a>
+            </p>
+        </div>
+
+    </div>
+
+    <div class="right-side">
+
+        <div class="top-image glitch">
+            <img src="Pictures\Untitled1_20260501145527.png" alt=" ">
+        </div>
+
+        <div class="spotify-box">
+            <h2>My Playlist</h2>
+<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/1Swl7C86irTQSLWddkcvH3?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+
+    </div>
+
+</div>
+</div>
+
+<script>
+var glitchTexts = document.querySelectorAll(
+    "h2, p, .navbar a, .section a"
+);
+
+function glitchRandomText() {
+    var pick = glitchTexts[Math.floor(Math.random() * glitchTexts.length)];
+    pick.classList.add("text-glitch");
+
+    setTimeout(function () {
+        pick.classList.remove("text-glitch");
+    }, 350);
+
+    var wait = 1000 + Math.random() * 2000;
+    setTimeout(glitchRandomText, wait);
+       
+}
+
+setTimeout(glitchRandomText, 1000);
+
+var profilePhoto = document.getElementById("profile-photo");
+var profileName = document.getElementById("profile-name");
+var profilePhotoOriginal = profilePhoto ? profilePhoto.getAttribute("src") : "";
+var profileNameOriginal = profileName ? profileName.textContent : "";
+
+function glitchSwapPhoto() {
+    if (!profilePhoto) return;
+    var altSrc = profilePhoto.getAttribute("data-alt-src");
+    if (!altSrc) return;
+
+    profilePhoto.classList.add("identity-glitch");
+    profilePhoto.src = altSrc;
+
+    setTimeout(function () {
+        profilePhoto.src = profilePhotoOriginal;
+        profilePhoto.classList.remove("identity-glitch");
+    }, 1000);
+}
+
+function glitchSwapName() {
+    if (!profileName) return;
+    var altText = profileName.getAttribute("data-alt-text");
+    if (!altText) return;
+
+    profileName.classList.add("identity-swap");
+    profileName.textContent = altText;
+
+    setTimeout(function () {
+        profileName.textContent = profileNameOriginal;
+        profileName.classList.remove("identity-swap");
+    }, 1000);
+}
+
+function scheduleIdentityGlitch() {
+    var roll = Math.random();
+    if (roll < 0.35) {
+        glitchSwapPhoto();
+    } else if (roll < 0.7) {
+        glitchSwapName();
+    } else {
+        glitchSwapPhoto();
+        glitchSwapName();
+    }
+
+    setTimeout(scheduleIdentityGlitch, 4000 + Math.random() * 6000);
+}
+
+setTimeout(scheduleIdentityGlitch, 2500);
+
+var glitchOverlay = document.getElementById("glitchOverlay");
+var glitchNoise = document.getElementById("glitchNoise");
+var distortTypes = ["shake", "rgb", "warp", "flash", "slices", "noise"];
+
+function buildSliceTear() {
+    glitchOverlay.innerHTML = "";
+    var count = 4 + Math.floor(Math.random() * 6);
+    var y = 0;
+    for (var i = 0; i < count; i++) {
+        var h = 4 + Math.random() * 14;
+        var slice = document.createElement("div");
+        slice.className = "slice";
+        slice.style.top = y + "%";
+        slice.style.height = h + "%";
+        slice.style.transform = "translateX(" + ((Math.random() - 0.5) * 24).toFixed(1) + "%)";
+        glitchOverlay.appendChild(slice);
+        y += h + Math.random() * 12;
+        if (y > 100) break;
+    }
+}
+
+function clearScreenDistort(type) {
+    document.body.classList.remove("distort-" + type);
+    glitchOverlay.classList.remove("is-active");
+    glitchOverlay.innerHTML = "";
+    glitchNoise.classList.remove("is-active");
+}
+
+function triggerScreenDistort() {
+    var type = distortTypes[Math.floor(Math.random() * distortTypes.length)];
+    var duration = 90 + Math.random() * 400;
+
+    if (type === "slices") {
+        buildSliceTear();
+        glitchOverlay.classList.add("is-active");
+    } else if (type === "noise") {
+        glitchNoise.classList.add("is-active");
+    } else {
+        document.body.classList.add("distort-" + type);
+    }
+
+    setTimeout(function () {
+        clearScreenDistort(type);
+    }, duration);
+
+    var wait = 4000 + Math.random() * 6500;
+    setTimeout(triggerScreenDistort, wait);
+}
+
+setTimeout(triggerScreenDistort, 2400);
+</script>
+
+</body>
+</html>
