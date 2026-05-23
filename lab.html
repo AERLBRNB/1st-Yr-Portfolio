@@ -403,7 +403,7 @@
 
       <div class="image-frame is-empty" id="image-frame">
         <div class="quiz-image-wrap" id="quiz-image-wrap">
-          <img id="quiz-image" src="" alt="">
+          <a id="imageLink" href=""><img id="quiz-image" src="" alt=""></a>
         </div>
       </div>
     </div>
@@ -417,6 +417,12 @@
       3: "Pictures\\Screenshot 2026-05-21 021415.png",
     };
 
+    var quizLinks = {
+      1:"Carousel.html",
+      2:"JavaScript.html",
+      3:"Registration.html",
+    }
+    
     var buttons = document.querySelectorAll(".quiz-btn");
     var frame = document.getElementById("image-frame");
     var wrap = document.getElementById("quiz-image-wrap");
@@ -424,6 +430,7 @@
 
     function showQuiz(id) {
       var src = quizImages[id];
+      var link = document.getElementById("imageLink");
 
       buttons.forEach(function (btn) {
         btn.classList.toggle("is-active", btn.getAttribute("data-quiz") === String(id));
@@ -436,12 +443,15 @@
         frame.classList.add("is-empty");
         img.removeAttribute("src");
         img.alt = "";
+        link.href = "";
         return;
       }
 
       frame.classList.remove("is-empty");
       img.src = src;
       img.alt = "Lab " + id;
+      link.href = quizLinks[id];
+      link.target = "_blank";
       wrap.classList.add("is-visible");
     }
 
